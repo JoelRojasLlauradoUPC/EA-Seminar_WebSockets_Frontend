@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { io, Socket } from 'socket.io-client';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface Mensaje {
   usuario: any;
@@ -18,12 +18,18 @@ export interface Mensaje {
 export class Chat {
   private socket: Socket;
   private readonly SERVER_URL = 'http://localhost:1337';
+  private registeredUserName: string = '';
+  private onlineUsersSubject = new BehaviorSubject<string[]>([]);
+  public readonly onlineUsers$ = this.onlineUsersSubject.asObservable();
 
   constructor(private http: HttpClient) {
     this.socket = io(this.SERVER_URL);
 
     this.socket.on('connect', () => {
       console.log('✅ Socket conectado:', this.socket.id);
+      if (this.registeredUserName) {
+        this.socket.emit('register-user', this.registeredUserName);
+      }
     });
 
     this.socket.on('disconnect', () => {
@@ -31,6 +37,44 @@ export class Chat {
 
     this.socket.on('user-typing', (data) => {
     });
+
+    this.socket.on('online-users', (payload: unknown) => {
+      console.log('[SOCKET] Evento online-users recibido:', payload);
+      this.updateUsersFromPayload(payload);
+    }); //imprimir en consola y trucar a funcio x actualitzar
+  }
+
+  registerUser(usuarioName: string): void {
+    this.registeredUserName = usuarioName?.trim() || '';
+    if (this.registeredUserName && this.socket.connected) {
+      this.socket.emit('register-user', this.registeredUserName);
+    } // validació: x evitar q es repeteixi el nom al obrir dues finestres
+  }
+
+  private updateUsersFromPayload(payload: unknown): void {
+    if (Array.isArray(payload)) {
+      this.onlineUsersSubject.next(this.toStringArray(payload));
+      return;
+    }
+
+    if (payload && typeof payload === 'object') {
+      const data = payload as Record<string, unknown>;
+      const online = data['onlineUsers'] ?? data['online'] ?? data['usuariosOnline'];
+
+      if (online !== undefined) {
+        this.onlineUsersSubject.next(this.toStringArray(online));
+      }
+    }
+  } //mostrar la llista
+
+  private toStringArray(value: unknown): string[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item: unknown) => (typeof item === 'string' ? item : String(item ?? '')))
+      .filter((item: string) => item.trim().length > 0);
   }
 
   getHistory(): Observable<Mensaje[]> {
@@ -79,6 +123,7 @@ export class Chat {
   disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
+      this.onlineUsersSubject.next([]);
     }
   }
 }

@@ -20,12 +20,14 @@ export class ChatComponent implements OnInit, OnDestroy {
   
   public nuevoMensaje: string = '';
   public mensajes: Mensaje[] = [];
+  public usuariosOnline: string[] = [];
 
   public typingUser: string | null = null;
 
   private messageSub!: Subscription;
   private typingSub!: Subscription;
   private stopTypingSub!: Subscription;
+  private onlineUsersSub!: Subscription;
   private typingTimeout: any;
 
   constructor(
@@ -52,6 +54,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.scrollToBottom();
     });
 
+    this.chatService.registerUser(this.usuarioActivoName || this.usuarioActivo);
     this.chatService.joinOrganization(this.organizacionActiva);
 
     this.messageSub = this.chatService.getMessages().subscribe((mensaje: Mensaje) => {
@@ -68,12 +71,18 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.typingUser = null;
       this.cdr.detectChanges();
     });
+
+    this.onlineUsersSub = this.chatService.onlineUsers$.subscribe((users: string[]) => {
+      this.usuariosOnline = users;
+      this.cdr.detectChanges();
+    });
   }
 
   ngOnDestroy(): void {
     if (this.messageSub) this.messageSub.unsubscribe();
     if (this.typingSub) this.typingSub.unsubscribe();
     if (this.stopTypingSub) this.stopTypingSub.unsubscribe();
+    if (this.onlineUsersSub) this.onlineUsersSub.unsubscribe();
     this.chatService.disconnect();
   }
 
@@ -120,3 +129,5 @@ export class ChatComponent implements OnInit, OnDestroy {
     }, 100);
   }
 }
+
+export { Chat };

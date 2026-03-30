@@ -19,46 +19,64 @@
     </div>
   </header>
 
-  <div class="chat-messages" id="chat-messages">
-    <div class="message-list">
-      @for (mensaje of mensajes; track mensaje._id) {
-        <div 
-          class="message-bubble" 
-          [ngClass]="{'message-mine': esMensajeMio(mensaje), 'message-other': !esMensajeMio(mensaje)}"
-        >
-          <div class="message-sender" *ngIf="!esMensajeMio(mensaje)">
-            {{ getUsuarioName(mensaje.usuario) }}
-          </div>
-          <div class="message-content">
-            {{ mensaje.contenido }}
-          </div>
+  <div class="chat-content">
+    <div class="chat-main">
+      <div class="chat-messages" id="chat-messages">
+        <div class="message-list">
+          @for (mensaje of mensajes; track mensaje._id) {
+            <div 
+              class="message-bubble" 
+              [ngClass]="{'message-mine': esMensajeMio(mensaje), 'message-other': !esMensajeMio(mensaje)}"
+            >
+              <div class="message-sender" *ngIf="!esMensajeMio(mensaje)">
+                {{ getUsuarioName(mensaje.usuario) }}
+              </div>
+              <div class="message-content">
+                {{ mensaje.contenido }}
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              No hay mensajes todavía. ¡Escribe algo para empezar el chat!
+            </div>
+          }
         </div>
-      } @empty {
-        <div class="empty-state">
-          No hay mensajes todavía. ¡Escribe algo para empezar el chat!
-        </div>
-      }
-    </div>
-  </div>
+      </div>
 
-  <footer class="chat-footer">
-    <form (ngSubmit)="enviarMensaje()" class="input-form">
-      <input 
-        type="text" 
-        [(ngModel)]="nuevoMensaje" 
-        name="mensajeInput" 
-        placeholder="Escribe su mensaje aquí..." 
-        autocomplete="off"
-        class="message-input"
-        (input)="onTyping()"
-        required
-      />
-      <button type="submit" class="send-button" [disabled]="!nuevoMensaje.trim()">
-        Enviar
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-        </svg>
-      </button>
-    </form>
-  </footer>
+      <footer class="chat-footer">
+        <form (ngSubmit)="enviarMensaje()" class="input-form">
+          <input 
+            type="text" 
+            [(ngModel)]="nuevoMensaje" 
+            name="mensajeInput" 
+            placeholder="Escribe su mensaje aquí..." 
+            autocomplete="off"
+            class="message-input"
+            (input)="onTyping()"
+            required
+          />
+          <button type="submit" class="send-button" [disabled]="!nuevoMensaje.trim()">
+            Enviar
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </form>
+      </footer>
+    </div>
+
+    <aside class="users-sidebar">
+      <h3 class="users-title">Usuarios</h3>
+
+      <div class="users-section">
+        <h4>Usuarios Online</h4>
+        <ul *ngIf="usuariosOnline.length > 0; else noOnlineUsers">
+          <li *ngFor="let usuario of usuariosOnline">{{ usuario }}</li>
+        </ul>
+        <ng-template #noOnlineUsers>
+          <p class="users-empty">No hay usuarios conectados</p>
+        </ng-template>
+      </div>
+    </aside>
+  </div>
 </div>

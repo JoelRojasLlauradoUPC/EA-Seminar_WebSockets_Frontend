@@ -18,6 +18,20 @@
   border: 1px solid #eaeaea;
 }
 
+.chat-content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.chat-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .chat-header {
   display: flex;
   justify-content: space-between;
@@ -101,6 +115,57 @@
   padding: 1.5rem;
   background-color: #fcfcfc;
   scroll-behavior: smooth;
+}
+
+.users-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid #eaeaea;
+  background-color: #f8fafc;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.users-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.users-section {
+  margin-bottom: 1rem;
+}
+
+.users-section h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+}
+
+.users-section ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.users-section li {
+  font-size: 0.84rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+.users-empty {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #64748b;
 }
 
 .message-list {
@@ -220,4 +285,17 @@
 .chat-messages::-webkit-scrollbar-thumb {
   background-color: #cbd5e1;
   border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+  .chat-content {
+    flex-direction: column;
+  }
+
+  .users-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid #eaeaea;
+    max-height: 180px;
+  }
 }
