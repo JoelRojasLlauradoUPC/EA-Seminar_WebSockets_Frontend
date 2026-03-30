@@ -71,7 +71,7 @@
       <div class="users-section">
         <h4>Usuarios Online</h4>
         <ul *ngIf="usuariosOnline.length > 0; else noOnlineUsers">
-          <li *ngFor="let usuario of usuariosOnline">{{ usuario }}</li>
+          <li *ngFor="let usuario of usuariosOnline">{{ usuario }}</li> <!-- x cada usuario connectat -->
         </ul>
         <ng-template #noOnlineUsers>
           <p class="users-empty">No hay usuarios conectados</p>
